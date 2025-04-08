@@ -71,20 +71,20 @@ jobs:
           echo $NEW_VERSION > version.txt
 
       - name: Commit new version
-        env:
-          PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@github.com'
           git add version.txt
-          git commit -m "Bump version to ${{ env.NEW_VERSION }}"
-          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git commit -m "Bump version to ${{ env.NEW_VERSION }}" || echo "No changes to commit"
+          git push origin HEAD:main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.NEW_VERSION }}
           name: Release ${{ env.NEW_VERSION }}
           draft: false
